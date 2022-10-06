@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<project name="JavaANTproject" basedir="." default="run">
+	<!-- basedir="." means defaultPathOfProject -->
+	<!-- default="run" means go to name="run" -->
+	
+	<!-- 'init' target for Initializing Variables -->
+	<target name="init">
+		<property name="bin" value="${basedir}/bin"/> <!-- contains .class files -->
+		<property name="lib" value="${basedir}/libraries"/> <!-- contains jar files -->
+		<property name="src" value="${basedir}/src"/> <!-- contains .java files -->
+		<property name="report" value="${basedir}/report"/>
+	</target>
+
+	<!-- 'clean' target -->
+	<target name="clean" depends="init"> <!-- depends="init" means before executing clean, it will execute "init"-->
+		<echo message="Deleting existing report folder" /> <!-- echo is like a print statement-->
+		<delete dir="${report}" />
+		<echo message="Deleting existing bin folder" />
+		<delete dir="${bin}" />
+		<echo message="Creating empty bin folder" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<!-- 'compile' target -->
+	<target name="compile" depends="clean"> <!-- depends="clean" means before executing complie, it will execute "clean"-->
+		<javac srcdir="${src}" destdir="${bin}" > <!-- compling from src and pasting it to bin -->
+			<classpath>
+				<pathelement path="${bin}"></pathelement>
+				<fileset dir="${lib}">
+					<include name="**/*.jar"/> <!-- setting jar files, * means all -->
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<!-- ======Set the classpath ====-->
+	<path id="classpath" >
+		<pathelement path="bin" ></pathelement>
+		<fileset dir="libraries" >
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- 'run' target -->
+	<target name="run" depends="compile"> <!-- depends="compile" means before executing run, it will execute "compile"-->
+		<mkdir dir="${report}" /> <!-- creating report directory/folder -->
+		<taskdef name="testng" classname="org.testng.TestNGAntTask">
+			<classpath location="${lib}/testng-6.14.3.jar" /> <!-- cross check its version -->
+		</taskdef>
+		<testng outputdir="${report}" classpathref="classpath" useDefaultListeners="true">
+			<xmlfileset dir="${src}" includes="testng.xml" /> <!-- it will run testng.xml files -->
+		</testng>
+	</target>
+
+</project>
